@@ -28,6 +28,8 @@ async function main() {
   await createItems();
   console.log('Debug: Closing mongoose');
   mongoose.connection.close();
+  console.log('Debug: Connection closed');
+  process.exit(0); // Explicitly exit the Node.js process
 }
 
 // We pass the index to the ...Create functions so that, for example,

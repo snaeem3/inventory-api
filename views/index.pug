@@ -2,4 +2,15 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to your #[em Inventory] built using Express.
+
+  h1 Dynamic content
+
+  p The Inventory has the following record counts:
+
+  ul
+    li #[strong Items:] !{item_count}
+    //- li #[strong Copies:] !{book_instance_count}
+    //- li #[strong Copies available:] !{book_instance_available_count}
+    //- li #[strong Authors:] !{author_count}
+    li #[strong Categories:] !{category_count}
