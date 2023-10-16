@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1 Name: #{item.name}
+
+  p #[strong Summary:] #{item.description}
+  p #[strong Category: ]
+    each val, index in item.category
+      a(href=val.url) #{val.name}
+      if index < item.category.length - 1
+        |,
