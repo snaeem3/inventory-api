@@ -117,12 +117,23 @@ exports.item_create_post = [
 
 // Display item delete form on GET.
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: item delete GET');
+  const item = await Item.findById(req.params.id).exec();
+
+  if (item === null) {
+    // No results
+    res.redirect('/catalog/items');
+  }
+  res.render('item_delete', {
+    title: 'Delete Item',
+    item,
+  });
 });
 
 // Handle item delete on POST.
 exports.item_delete_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: item delete POST');
+  // Assume valid item id in field
+  await Item.findByIdAndDelete(req.params.id);
+  res.redirect('/catalog/items');
 });
 
 // Display item update form on GET.

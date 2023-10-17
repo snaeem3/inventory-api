@@ -8,4 +8,7 @@ block content
     each val, index in item.category
       a(href=val.url) #{val.name}
       if index < item.category.length - 1
-        |,
+        |, 
+  hr
+  p
+    a(href=item.url+'/delete') Delete item
