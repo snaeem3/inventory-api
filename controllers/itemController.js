@@ -138,10 +138,94 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display item update form on GET.
 exports.item_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: item update GET');
+  // Get item and categories for form.
+  const [item, allCategories] = await Promise.all([
+    Item.findById(req.params.id).populate('category').exec(),
+    Category.find().exec(),
+  ]);
+
+  if (item === null) {
+    // No results.
+    const err = new Error('Item not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  // Mark our selected categories as checked.
+  for (const category of allCategories) {
+    for (const item_c of item.category) {
+      if (category._id.toString() === item_c._id.toString()) {
+        category.checked = 'true';
+      }
+    }
+  }
+
+  res.render('item_form', {
+    title: 'Update Item',
+    categories: allCategories,
+    item,
+  });
 });
 
 // Handle item update on POST.
-exports.item_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: item update POST');
-});
+exports.item_update_post = [
+  // Convert the category to an array.
+  (req, res, next) => {
+    if (!(req.body.category instanceof Array)) {
+      if (typeof req.body.category === 'undefined') {
+        req.body.category = [];
+      } else {
+        req.body.category = new Array(req.body.category);
+      }
+    }
+    next();
+  },
+
+  // Validate and sanitize fields.
+  body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
+  body('description', 'Description must not be empty.')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('genre.*').escape(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a Item object with escaped/trimmed data and old id.
+    const item = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      category:
+        typeof req.body.category === 'undefined' ? [] : req.body.category,
+      _id: req.params.id, // This is required, or a new ID will be assigned!
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      // Get all genres for form
+      const [allCategories] = await Promise.all([Category.find().exec()]);
+
+      // Mark our selected genres as checked.
+      for (const category of allCategories) {
+        if (item.genre.indexOf(item._id) > -1) {
+          item.checked = 'true';
+        }
+      }
+      res.render('item_form', {
+        title: 'Update Item',
+        categories: allCategories,
+        item,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid. Update the record.
+      const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
+      // Redirect to book detail page.
+      res.redirect(updatedItem.url);
+    }
+  }),
+];
