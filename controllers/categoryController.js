@@ -41,7 +41,7 @@ exports.category_create_get = asyncHandler(async (req, res, next) => {
 // Handle Category create on POST.
 exports.category_create_post = [
   // Validate and sanitize the name field.
-  body('name', 'Genre name must contain at least 3 characters')
+  body('name', 'Category name must contain at least 3 characters')
     .trim()
     .isLength({ min: 3 })
     .escape(),
@@ -123,10 +123,49 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display Category update form on GET.
 exports.category_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Category update GET');
+  const category = await Category.findById(req.params.id).exec();
+
+  if (category === null) {
+    // No results
+    const err = new Error('Category not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('category_form', {
+    title: 'Update Category',
+    category,
+  });
 });
 
 // Handle Category update on POST.
-exports.category_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Category update POST');
-});
+exports.category_update_post = [
+  // Validate and sanitize the name field.
+  body('name', 'Category name must contain at least 3 characters')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+
+  // Process request after validation and sanitization
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a category object with escaped and trimmed data.
+    const category = new Category({ name: req.body.name, _id: req.params.id });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render('category_form', {
+        title: 'Create Category',
+        category,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid.
+      await Category.findByIdAndUpdate(req.params.id, category);
+      // New category saved. Redirect to category detail page.
+      res.redirect(category.url);
+    }
+  }),
+];
