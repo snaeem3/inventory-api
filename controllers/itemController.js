@@ -78,6 +78,9 @@ exports.item_create_post = [
   body('quantity', 'Quantity must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
+  body('value', 'Value must be whole and non-negative.')
+    .isInt({ min: 0 })
+    .escape(),
   body('category.*').escape(),
   // Process request after validation and sanitization.
 
@@ -91,6 +94,7 @@ exports.item_create_post = [
       description: req.body.description,
       category: req.body.category,
       quantity: req.body.quantity,
+      value: req.body.value,
     });
 
     if (!errors.isEmpty()) {
@@ -194,6 +198,9 @@ exports.item_update_post = [
   body('quantity', 'Quantity must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
+  body('value', 'Valu must be whole and non-negative.')
+    .isInt({ min: 0 })
+    .escape(),
   body('category.*').escape(),
 
   // Process request after validation and sanitization.
@@ -208,6 +215,7 @@ exports.item_update_post = [
       category:
         typeof req.body.category === 'undefined' ? [] : req.body.category,
       quantity: req.body.quantity,
+      value: req.body.value,
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 

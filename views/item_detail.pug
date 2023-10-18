@@ -10,6 +10,7 @@ block content
       if index < item.category.length - 1
         |, 
   p #[strong Quantity: ] #{item.quantity}
+  p #[strong Value] (gold): #{item.value}
   hr
   p
     a(href=item.url+'/delete') Delete item
