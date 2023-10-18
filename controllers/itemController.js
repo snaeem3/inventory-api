@@ -75,6 +75,9 @@ exports.item_create_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
+  body('quantity', 'Quantity must be whole and non-negative.')
+    .isInt({ min: 0 })
+    .escape(),
   body('category.*').escape(),
   // Process request after validation and sanitization.
 
@@ -87,6 +90,7 @@ exports.item_create_post = [
       name: req.body.name,
       description: req.body.description,
       category: req.body.category,
+      quantity: req.body.quantity,
     });
 
     if (!errors.isEmpty()) {
@@ -95,7 +99,7 @@ exports.item_create_post = [
       // Get all categories for form.
       const [allCategories] = await Promise.all([Category.find().exec()]);
 
-      // Mark our selected genres as checked.
+      // Mark our selected categories as checked.
       for (const category of allCategories) {
         if (item.category.includes(category._id)) {
           category.checked = 'true';
@@ -187,7 +191,10 @@ exports.item_update_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body('genre.*').escape(),
+  body('quantity', 'Quantity must be whole and non-negative.')
+    .isInt({ min: 0 })
+    .escape(),
+  body('category.*').escape(),
 
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
@@ -200,18 +207,19 @@ exports.item_update_post = [
       description: req.body.description,
       category:
         typeof req.body.category === 'undefined' ? [] : req.body.category,
+      quantity: req.body.quantity,
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/error messages.
 
-      // Get all genres for form
+      // Get all categories for form
       const [allCategories] = await Promise.all([Category.find().exec()]);
 
-      // Mark our selected genres as checked.
+      // Mark our selected categories as checked.
       for (const category of allCategories) {
-        if (item.genre.indexOf(item._id) > -1) {
+        if (item.category.indexOf(item._id) > -1) {
           item.checked = 'true';
         }
       }
@@ -224,7 +232,7 @@ exports.item_update_post = [
     } else {
       // Data from form is valid. Update the record.
       const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
-      // Redirect to book detail page.
+      // Redirect to item detail page.
       res.redirect(updatedItem.url);
     }
   }),

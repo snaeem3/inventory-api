@@ -9,6 +9,7 @@ block content
       a(href=val.url) #{val.name}
       if index < item.category.length - 1
         |, 
+  p #[strong Quantity: ] #{item.quantity}
   hr
   p
     a(href=item.url+'/delete') Delete item
