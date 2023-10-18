@@ -95,6 +95,7 @@ exports.item_create_post = [
       category: req.body.category,
       quantity: req.body.quantity,
       value: req.body.value,
+      rarity: req.body.rarity,
     });
 
     if (!errors.isEmpty()) {
@@ -198,7 +199,7 @@ exports.item_update_post = [
   body('quantity', 'Quantity must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
-  body('value', 'Valu must be whole and non-negative.')
+  body('value', 'Value must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
   body('category.*').escape(),
@@ -216,6 +217,7 @@ exports.item_update_post = [
         typeof req.body.category === 'undefined' ? [] : req.body.category,
       quantity: req.body.quantity,
       value: req.body.value,
+      rarity: req.body.rarity,
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 

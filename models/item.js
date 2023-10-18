@@ -10,7 +10,8 @@ const ItemSchema = new Schema({
   value: { type: Number, min: 0 },
   rarity: {
     type: String,
-    enum: ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary'],
+    enum: ['Unknown', 'Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary'],
+    default: 'Unknown',
   },
   equippable: { type: Boolean, required: true, default: false },
   equipped: { type: Boolean, required: true, default: false },

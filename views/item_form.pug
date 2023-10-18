@@ -23,6 +23,15 @@ block content
     div.form-group
       label(for='value') Value (gold): 
       input#value.form-control(type='number', placeholder='1' name='value' min='0' step='1' value=(undefined===item ? '' : item.value))
+    div.form-group
+      label(for='rarity') Rarity: 
+      select#rarity.form-control(type='select' placeholder='Select rarity' name='rarity')
+        option(value='Unknown' selected=(undefined===item || item.rarity!='Unknown' ? false:'selected')) Unknown
+        option(value='Common' selected=(undefined===item || item.rarity!='Common' ? false:'selected')) Common
+        option(value='Uncommon' selected=(undefined===item || item.status!='Uncommon' ? false:'selected')) Uncommon
+        option(value='Rare' selected=(undefined===item || item.status!='Rare' ? false:'selected')) Rare
+        option(value='Very Rare' selected=(undefined===item || item.status!='Very Rare' ? false:'selected')) Very Rare
+        option(value='Legendary' selected=(undefined===item || item.status!='Legendary' ? false:'selected')) Legendary
     button.btn.btn-primary(type='submit') Submit
 
   if errors
