@@ -96,6 +96,7 @@ exports.item_create_post = [
       quantity: req.body.quantity,
       value: req.body.value,
       rarity: req.body.rarity,
+      equippable: req.body.equippable === 'on',
     });
 
     if (!errors.isEmpty()) {
@@ -209,6 +210,8 @@ exports.item_update_post = [
     // Extract the validation errors from a request.
     const errors = validationResult(req);
 
+    console.log(req.body.equippable === 'on');
+
     // Create a Item object with escaped/trimmed data and old id.
     const item = new Item({
       name: req.body.name,
@@ -218,6 +221,7 @@ exports.item_update_post = [
       quantity: req.body.quantity,
       value: req.body.value,
       rarity: req.body.rarity,
+      equippable: req.body.equippable === 'on',
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 

@@ -14,7 +14,7 @@ const ItemSchema = new Schema({
     default: 'Unknown',
   },
   equippable: { type: Boolean, required: true, default: false },
-  equipped: { type: Boolean, required: true, default: false },
+  equipped: { type: Boolean, default: false },
 });
 
 // Virtual for item's URL
