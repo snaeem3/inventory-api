@@ -97,6 +97,7 @@ exports.item_create_post = [
       value: req.body.value,
       rarity: req.body.rarity,
       equippable: req.body.equippable === 'on',
+      equipped: req.body.equipped === 'on',
     });
 
     if (!errors.isEmpty()) {
@@ -222,6 +223,7 @@ exports.item_update_post = [
       value: req.body.value,
       rarity: req.body.rarity,
       equippable: req.body.equippable === 'on',
+      equipped: req.body.equipped === 'on',
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
