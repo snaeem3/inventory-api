@@ -253,3 +253,23 @@ exports.item_update_post = [
     }
   }),
 ];
+
+// Display list of all Equippable/Equipped Items.
+exports.equippable_list = asyncHandler(async (req, res, next) => {
+  const allEquippedItems = await Item.find({ equipped: true }, 'name')
+    .sort({ name: 1 })
+    .exec();
+
+  const allUnequippedItems = await Item.find(
+    { equippable: true, equipped: false },
+    'name'
+  )
+    .sort({ name: 1 })
+    .exec();
+
+  res.render('equipment_list', {
+    title: 'Equippable Items',
+    equippedItems: allEquippedItems,
+    unEquippedItems: allUnequippedItems,
+  });
+});

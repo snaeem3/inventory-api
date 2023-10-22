@@ -35,6 +35,9 @@ router.get('/item/:id', item_controller.item_detail);
 // GET request for list of all item items.
 router.get('/items', item_controller.item_list);
 
+// GET request for list of all equippable items.
+router.get('/items/equippable', item_controller.equippable_list);
+
 /// Category ROUTES ///
 
 // GET request for creating a category. NOTE This must come before route that displays category (uses id).

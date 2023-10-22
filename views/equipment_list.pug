@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1= title
+
+  h2 Equipped Items
+  ul
+    each equippedItem in equippedItems
+      li
+        a(href=equippedItem.url) #{equippedItem.name}
+
+    else
+      li There are no equipped items.
+  
+  h2 Unequipped Items
+  ul
+    each unEquippedItem in unEquippedItems
+      li
+        a(href=unEquippedItem.url) #{unEquippedItem.name}
+
+    else
+      li There are no un-equipped items.
