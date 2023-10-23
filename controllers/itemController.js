@@ -216,8 +216,6 @@ exports.item_update_post = [
     // Extract the validation errors from a request.
     const errors = validationResult(req);
 
-    console.log(req.body.equippable === 'on');
-
     // Create a Item object with escaped/trimmed data and old id.
     const item = new Item({
       name: req.body.name,
@@ -277,4 +275,25 @@ exports.equippable_list = asyncHandler(async (req, res, next) => {
     equippedItems: allEquippedItems,
     unEquippedItems: allUnequippedItems,
   });
+});
+
+// Unequip item POST
+exports.equipment_unequip_post = asyncHandler(async (req, res, next) => {
+  // Get details of item
+  const [item] = await Promise.all([
+    Item.findById(req.params.id).populate('category').exec(),
+  ]);
+
+  if (item === null) {
+    // No results.
+    const err = new Error('Item not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  // Unequip item and update in database
+  item.equipped = false;
+  const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
+
+  res.redirect('/catalog/items/equippable');
 });

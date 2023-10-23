@@ -8,6 +8,8 @@ block content
     each equippedItem in equippedItems
       li
         a(href=equippedItem.url) #{equippedItem.name}
+        form(method='POST' action=`/catalog/item/${equippedItem.id}/unequip`)
+          button.btn.btn-primary(type='submit' value='unequip') Un-equip
 
     else
       li There are no equipped items.
