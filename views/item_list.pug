@@ -3,11 +3,17 @@ extends layout
 block content
   h1= title
 
-  ul
+  table
+    tr
+      th Name
+      th Description
+      th Quantity
     each item in item_list
-      li
-        a(href=item.url) #{item.name}
-        //- |  (#{book.author.name})
+      tr
+        td
+          a(href=item.url) #{item.name}
+        td #{item.description}
+        td #{item.quantity}
 
     else
-      li There are no items.
+      tr There are no items.

@@ -5,21 +5,26 @@ const Category = require('../models/category');
 
 exports.index = asyncHandler(async (req, res, next) => {
   // Get details of items and category counts (in parallel)
-  const [numItems, numCategories] = await Promise.all([
-    Item.countDocuments({}).exec(),
-    Category.countDocuments({}).exec(),
-  ]);
+  const [numItems, numCategories, numEquipped, numEquippable] =
+    await Promise.all([
+      Item.countDocuments({}).exec(),
+      Category.countDocuments({}).exec(),
+      Item.countDocuments({ equipped: true }).exec(),
+      Item.countDocuments({ equippable: true }).exec(),
+    ]);
 
   res.render('index', {
     title: 'Inventory Home',
     item_count: numItems,
     category_count: numCategories,
+    equipped_items: numEquipped,
+    equippable_items: numEquippable,
   });
 });
 
 // Display list of all items.
 exports.item_list = asyncHandler(async (req, res, next) => {
-  const allItems = await Item.find({}, 'name')
+  const allItems = await Item.find({})
     .sort({ name: 1 })
     // .populate("author")
     .exec();

@@ -4,7 +4,7 @@ block content
   h1= title
   p Welcome to your #[em Inventory] built using Express.
 
-  h1 Dynamic content
+  h1 Inventory Overview
 
   p The Inventory has the following record counts:
 
@@ -14,3 +14,4 @@ block content
     //- li #[strong Copies available:] !{book_instance_available_count}
     //- li #[strong Authors:] !{author_count}
     li #[strong Categories:] !{category_count}
+    li #[strong Equipped Items:] !{equipped_items} / !{equippable_items}
