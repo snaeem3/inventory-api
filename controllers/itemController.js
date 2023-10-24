@@ -5,13 +5,19 @@ const Category = require('../models/category');
 
 exports.index = asyncHandler(async (req, res, next) => {
   // Get details of items and category counts (in parallel)
-  const [numItems, numCategories, numEquipped, numEquippable] =
-    await Promise.all([
-      Item.countDocuments({}).exec(),
-      Category.countDocuments({}).exec(),
-      Item.countDocuments({ equipped: true }).exec(),
-      Item.countDocuments({ equippable: true }).exec(),
-    ]);
+  const [
+    numItems,
+    numCategories,
+    numEquipped,
+    numEquippable,
+    top3ValuableItems,
+  ] = await Promise.all([
+    Item.countDocuments({}).exec(),
+    Category.countDocuments({}).exec(),
+    Item.countDocuments({ equipped: true }).exec(),
+    Item.countDocuments({ equippable: true }).exec(),
+    Item.find({}).sort({ value: -1 }).limit(3).exec(),
+  ]);
 
   res.render('index', {
     title: 'Inventory Home',
@@ -19,6 +25,7 @@ exports.index = asyncHandler(async (req, res, next) => {
     category_count: numCategories,
     equipped_items: numEquipped,
     equippable_items: numEquippable,
+    valuableItemList: top3ValuableItems,
   });
 });
 
