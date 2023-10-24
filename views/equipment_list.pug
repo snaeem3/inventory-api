@@ -19,6 +19,8 @@ block content
     each unEquippedItem in unEquippedItems
       li
         a(href=unEquippedItem.url) #{unEquippedItem.name}
+        form(method='POST' action=`/catalog/item/${unEquippedItem.id}/equip`)
+          button.btn.btn-primary(type='submit' value='equip') Equip
 
     else
       li There are no un-equipped items.

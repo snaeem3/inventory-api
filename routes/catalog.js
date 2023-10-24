@@ -41,6 +41,9 @@ router.get('/items/equippable', item_controller.equippable_list);
 // POST request to unequip item
 router.post('/item/:id/unequip', item_controller.equipment_unequip_post);
 
+// POST request to equip item
+router.post('/item/:id/equip', item_controller.equipment_equip_post);
+
 /// Category ROUTES ///
 
 // GET request for creating a category. NOTE This must come before route that displays category (uses id).

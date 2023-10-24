@@ -297,3 +297,24 @@ exports.equipment_unequip_post = asyncHandler(async (req, res, next) => {
 
   res.redirect('/catalog/items/equippable');
 });
+
+// Equip item POST
+exports.equipment_equip_post = asyncHandler(async (req, res, next) => {
+  // Get details of item
+  const [item] = await Promise.all([
+    Item.findById(req.params.id).populate('category').exec(),
+  ]);
+
+  if (item === null) {
+    // No results.
+    const err = new Error('Item not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  // Equip item and update in database
+  item.equipped = true;
+  const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
+
+  res.redirect('/catalog/items/equippable');
+});
