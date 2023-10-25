@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
 const Item = require('../models/item');
 const Category = require('../models/category');
+const Gold = require('../models/gold');
 
 exports.index = asyncHandler(async (req, res, next) => {
   // Get details of items and category counts (in parallel)
@@ -11,12 +12,14 @@ exports.index = asyncHandler(async (req, res, next) => {
     numEquipped,
     numEquippable,
     top3ValuableItems,
+    gold,
   ] = await Promise.all([
     Item.countDocuments({}).exec(),
     Category.countDocuments({}).exec(),
     Item.countDocuments({ equipped: true }).exec(),
     Item.countDocuments({ equippable: true }).exec(),
     Item.find({}).sort({ value: -1 }).limit(3).exec(),
+    Gold.findOne({}).exec(),
   ]);
 
   res.render('index', {
@@ -26,6 +29,7 @@ exports.index = asyncHandler(async (req, res, next) => {
     equipped_items: numEquipped,
     equippable_items: numEquippable,
     valuableItemList: top3ValuableItems,
+    gold,
   });
 });
 

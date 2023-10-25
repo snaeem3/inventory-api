@@ -10,6 +10,7 @@ const userArgs = process.argv.slice(2);
 const mongoose = require('mongoose');
 const Item = require('./models/item');
 const Category = require('./models/category');
+const Gold = require('./models/gold');
 
 const categories = [];
 const items = [];
@@ -26,6 +27,7 @@ async function main() {
   console.log('Debug: Should be connected?');
   await createCategories();
   await createItems();
+  await createGold();
   console.log('Debug: Closing mongoose');
   mongoose.connection.close();
   console.log('Debug: Connection closed');
@@ -55,6 +57,16 @@ async function itemCreate(index, name, description, category) {
   console.log(`Added item: ${name}`);
 }
 
+async function goldCreate(quantity) {
+  const goldDetail = {
+    quantity,
+  };
+
+  const gold = new Gold(goldDetail);
+  await gold.save();
+  console.log(`Added ${quantity} gold`);
+}
+
 async function createCategories() {
   console.log('Adding categories');
   await Promise.all([
@@ -75,4 +87,9 @@ async function createItems() {
       [categories[1]]
     ),
   ]);
+}
+
+async function createGold() {
+  console.log('Adding Gold');
+  await goldCreate(200);
 }

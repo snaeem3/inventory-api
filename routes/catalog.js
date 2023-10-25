@@ -5,6 +5,7 @@ const router = express.Router();
 // Require controller modules.
 const item_controller = require('../controllers/itemController');
 const category_controller = require('../controllers/categoryController');
+const gold_controller = require('../controllers/goldController');
 
 /// Item ROUTES ///
 
@@ -69,5 +70,16 @@ router.get('/category/:id', category_controller.category_detail);
 
 // GET request for list of all categories.
 router.get('/categories', category_controller.category_list);
+
+/// Gold ROUTES ///
+
+// GET request for gold detail
+router.get('/gold', gold_controller.gold_detail);
+
+// GET request to update gold.
+router.get('/gold/update', gold_controller.gold_update_get);
+
+// POST request to update gold.
+// router.post('/gold/update', gold_controller.gold_update_post);
 
 module.exports = router;
