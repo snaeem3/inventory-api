@@ -1,18 +1,247 @@
-/* body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Merriweather&display=swap");
+
+:root {
+  --section-padding: 1rem;
+  --section-margin: 1rem;
+  --border-radius-default: 0.75rem;
+  --primary-color: #2c3e50;
+  --primary-color-dark: #1c2833;
+  --secondary-color: #3498db;
+  --shade-color: #494949da;
+  --color-shadow: grey;
 }
 
+html {
+  /* font-size: 18px; */
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Merriweather", serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: var(--border-radius-default);
+  padding: var(--section-padding) calc(var(--section-padding) * 1);
+  text-decoration: none;
+  font-size: 1.25rem;
+  transition-duration: 0.2s;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+button:not(:disabled),
+input:not(:disabled),
+input:not(:disabled) + label,
+.clickable,
+.clickable:hover,
 a {
-  color: #00B7FF;
-} */
+  cursor: pointer;
+}
+
+button:not(:disabled):hover {
+  background-color: var(--primary-color-dark);
+}
+
+.box-shadow {
+  box-shadow: 2px 5px 5px var(--color-shadow);
+}
+
+.icon {
+  vertical-align: bottom;
+  max-width: 100%;
+}
+
+.icon:hover {
+  transform: scale(1.2);
+}
+
+.supporting-icon::before {
+  content: "";
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: super;
+  margin-left: 0.5rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon-btn::after {
+  content: "";
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.hidden {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(-100%);
+  transition: all 1s;
+}
+
+.hidden:nth-child(even) {
+  transform: translateX(100%);
+}
+
+.show,
+.in-view,
+.in-view:nth-child(even) {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+.sticky-element {
+  position: sticky;
+  top: 0;
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.centered {
+  position: fixed; /* or absolute */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  letter-spacing: 2px;
+  padding: 0 var(--section-padding);
+  text-align: center;
+  border-bottom: 2px solid black;
+  font-size: 1.5rem;
+  width: fit-content;
+}
+
+td {
+  letter-spacing: 1px;
+  padding: var(--section-padding);
+}
+
+tbody td {
+  text-align: center;
+}
+
+tfoot th {
+  text-align: right;
+}
+
+ul {
+  list-style: none;
+}
+
+body {
+  margin: 0;
+  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif; */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.root {
+  max-width: 100%;
+}
+
+.App {
+  display: grid;
+  /* flex-direction: column; */
+  background: linear-gradient(45deg, rgb(199, 181, 173), rgb(255, 151, 151));
+  min-height: 100vh; /* Keeps footer at bottom of page */
+}
+
 .sidebar-nav {
   margin-top: 20px;
   padding: 0;
   list-style: none;
+  font-size: 1.2rem;
+}
+
+.sidebar-nav li:first-child {
+  font-size: 1.5rem;
+}
+
+.sidebar-nav .icon {
+  /* max-width: 1rem; */
+  margin-right: 0.5rem;
+  vertical-align: text-top;
 }
 
 .inactive {
   color: gray;
   opacity: 0.7;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255, 225, 225, 0.637);
+}
+
+.delete::before {
+  background-image: url("/images/icons/delete.svg");
+}
+
+.update::before {
+  background-image: url("/images/icons/edit.svg");
+}
+
+footer {
+  text-align: center;
+  pointer-events: auto;
+  padding: var(--section-padding);
+  background: rgb(0, 0, 0);
+  color: white;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  margin-top: auto; /* Keeps footer at bottom of screen (not fixed) */
+}
+
+footer a {
+  cursor: pointer;
 }
