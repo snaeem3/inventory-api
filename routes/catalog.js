@@ -80,6 +80,6 @@ router.get('/gold', gold_controller.gold_detail);
 router.get('/gold/update', gold_controller.gold_update_get);
 
 // POST request to update gold.
-// router.post('/gold/update', gold_controller.gold_update_post);
+router.post('/gold/update', gold_controller.gold_update_post);
 
 module.exports = router;
