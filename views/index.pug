@@ -5,7 +5,7 @@ block content
   p Welcome to your Dungeons & Dragons Inventory built using Express.
 
   .dashboard-container
-    .dashboard-item
+    .dashboard-item.overview
       h2 Inventory Overview
 
       p The Inventory has the following record counts:
@@ -16,8 +16,8 @@ block content
         li #[strong Equipped Items:] !{equipped_items} / !{equippable_items}
         li #[strong Gold:] !{gold.quantity}
 
-    .dashboard-item
-      h2 Most valuable items in Inventory
+    .dashboard-item.most-valuable-items
+      h2 Most valuable items
       
       ol
         each item in valuableItemList
@@ -27,4 +27,4 @@ block content
         else
           li No items
 
-    h2.dashboard-item Net Worth: #{netWorth} gold
+    h2.dashboard-item.net-worth Net Worth: #{netWorth} gold
