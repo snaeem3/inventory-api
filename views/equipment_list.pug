@@ -3,24 +3,27 @@ extends layout
 block content
   h1= title
 
-  h2 Equipped Items
-  ul
-    each equippedItem in equippedItems
-      li
-        a(href=equippedItem.url) #{equippedItem.name}
-        form(method='POST' action=`/catalog/item/${equippedItem.id}/unequip`)
-          button.btn.btn-primary(type='submit' value='unequip') Un-equip
+  .equippable
+    .equipped
+      h2 Equipped Items
+      ul
+        each equippedItem in equippedItems
+          li
+            a(href=equippedItem.url) #{equippedItem.name}
+            form(method='POST' action=`/catalog/item/${equippedItem.id}/unequip`)
+              button.btn.btn-primary(type='submit' value='unequip') Un-equip
 
-    else
-      li There are no equipped items.
-  
-  h2 Unequipped Items
-  ul
-    each unEquippedItem in unEquippedItems
-      li
-        a(href=unEquippedItem.url) #{unEquippedItem.name}
-        form(method='POST' action=`/catalog/item/${unEquippedItem.id}/equip`)
-          button.btn.btn-primary(type='submit' value='equip') Equip
+        else
+          li There are no equipped items.
+    .divider
+    .unequipped
+      h2 Unequipped Items
+      ul
+        each unEquippedItem in unEquippedItems
+          li
+            a(href=unEquippedItem.url) #{unEquippedItem.name}
+            form(method='POST' action=`/catalog/item/${unEquippedItem.id}/equip`)
+              button.btn.btn-primary(type='submit' value='equip') Equip
 
-    else
-      li There are no un-equipped items.
+        else
+          li There are no un-equipped items.

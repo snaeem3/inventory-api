@@ -229,6 +229,37 @@ tr:nth-child(even) {
   background-image: url("/images/icons/edit.svg");
 }
 
+form {
+  padding: var(--section-padding);
+  width: fit-content;
+}
+
+form button {
+  width: 100%;
+}
+
+.equippable {
+  grid-template-columns: 1fr 1px 1fr;
+  justify-items: center;
+  padding: var(--section-padding);
+}
+
+.equippable h2 {
+  text-decoration: underline;
+}
+
+.equippable li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--section-padding);
+}
+
+.divider {
+  background: black;
+  width: 100%;
+}
+
 footer {
   text-align: center;
   pointer-events: auto;
@@ -244,4 +275,14 @@ footer {
 
 footer a {
   cursor: pointer;
+}
+
+@media (min-width: 780px) {
+  .equippable {
+    display: grid;
+  }
+
+  .equippable > *:first-child {
+    /* border-right: solid 1px black; */
+  }
 }

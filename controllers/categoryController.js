@@ -6,9 +6,22 @@ const Item = require('../models/item');
 // Display list of all Categories.
 exports.category_list = asyncHandler(async (req, res, next) => {
   const allCategories = await Category.find().sort({ name: 1 }).exec();
+
+  // Create an array to store category counts
+  const categoryCounts = await Promise.all(
+    allCategories.map(async (category) => {
+      const count = await Item.countDocuments({ category: category._id });
+      return {
+        category,
+        count,
+      };
+    })
+  );
+
   res.render('category_list', {
     title: 'Category List',
     list_categories: allCategories,
+    category_counts: categoryCounts,
   });
 });
 

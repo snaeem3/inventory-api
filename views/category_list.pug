@@ -7,6 +7,11 @@ block content
     each category in list_categories
       li
         a(href=category.url) #{category.name}
+        - const categoryCount = category_counts.find(c => c.category._id.equals(category._id));
+        if (categoryCount)
+          span : #{categoryCount.count} item(s)
+        else
+          span No items in this category
 
     else
       li There are no categories.
