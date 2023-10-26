@@ -5,7 +5,7 @@ const Category = require('../models/category');
 const Gold = require('../models/gold');
 
 exports.index = asyncHandler(async (req, res, next) => {
-  // Get details of items and category counts (in parallel)
+  // Get details of items, category counts, and gold (in parallel)
   const [
     numItems,
     numCategories,
@@ -22,6 +22,19 @@ exports.index = asyncHandler(async (req, res, next) => {
     Gold.findOne({}).exec(),
   ]);
 
+  // Calculate total item value
+  let totalValue = 0;
+  try {
+    const items = await Item.find().exec();
+
+    items.forEach((item) => {
+      totalValue += item.totalValue; // totalValue is a virtual property
+    });
+  } catch (error) {
+    console.error('Error calculating total value:', error);
+    throw error;
+  }
+
   res.render('index', {
     title: 'Inventory Home',
     item_count: numItems,
@@ -30,6 +43,7 @@ exports.index = asyncHandler(async (req, res, next) => {
     equippable_items: numEquippable,
     valuableItemList: top3ValuableItems,
     gold,
+    netWorth: totalValue + gold.quantity,
   });
 });
 

@@ -23,5 +23,14 @@ ItemSchema.virtual('url').get(function () {
   return `/catalog/item/${this._id}`;
 });
 
+// Virtual for total value
+ItemSchema.virtual('totalValue').get(function () {
+  if (this.quantity && this.value) {
+    return this.quantity * this.value;
+  }
+
+  return 0;
+});
+
 // Export model
 module.exports = mongoose.model('Item', ItemSchema);
