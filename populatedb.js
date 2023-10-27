@@ -57,9 +57,10 @@ async function itemCreate(index, name, description, category) {
   console.log(`Added item: ${name}`);
 }
 
-async function goldCreate(quantity) {
+async function goldCreate(quantity, transactions) {
   const goldDetail = {
     quantity,
+    transactions,
   };
 
   const gold = new Gold(goldDetail);
@@ -91,5 +92,7 @@ async function createItems() {
 
 async function createGold() {
   console.log('Adding Gold');
-  await goldCreate(200);
+  await goldCreate(200, [
+    { prevQuantity: 0, date: Date(), note: 'Initial quantity' },
+  ]);
 }

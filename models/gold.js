@@ -4,6 +4,13 @@ const { Schema } = mongoose;
 
 const GoldSchema = new Schema({
   quantity: { type: Number, required: true, min: 0 },
+  transactions: [
+    {
+      prevQuantity: Number,
+      date: Date,
+      note: { type: String, maxLength: 100 },
+    },
+  ],
 });
 
 // Virtual for gold's URL

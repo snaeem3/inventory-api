@@ -56,7 +56,16 @@ exports.gold_update_post = [
       // Data from form is valid. Update the record.
       const updatedGold = await Gold.findOneAndUpdate(
         {},
-        { quantity: gold.quantity }
+        {
+          quantity: gold.quantity,
+          $push: {
+            transactions: {
+              prevQuantity: gold.quantity,
+              date: new Date(),
+              note: req.body.transactionNote,
+            },
+          },
+        }
       );
       // Redirect to gold overview page.
       res.redirect('/catalog/gold');
