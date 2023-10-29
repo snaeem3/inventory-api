@@ -234,6 +234,11 @@ body {
   background: var(--secondary-color);
 }
 
+.dashboard-item ol,
+.dashboard-item ul {
+  padding: var(--section-padding);
+}
+
 .overview {
   grid-column: 1 / 2;
 }
@@ -281,7 +286,8 @@ form button {
 }
 
 .equippable h2 {
-  text-decoration: underline;
+  padding: var(--section-padding);
+  border-bottom: solid black 2px;
 }
 
 .equippable li {

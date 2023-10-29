@@ -6,9 +6,12 @@ block content
 
   h2 #[strong Quantity: ] #{gold.quantity}
 
+  h2 
+    a(href='/catalog/gold/update') Deposit or withdraw gold
+
   h2 #[strong Recent Transactions: ]
 
-  table
+  table.gold-transactions
     tr
       th Date
       th Balance 
@@ -21,6 +24,3 @@ block content
         td.transaction-note.italic #{transaction.note} 
     else
       tr No transactions
-
-  p 
-    a(href='/catalog/gold/update') Deposit or withdraw gold
