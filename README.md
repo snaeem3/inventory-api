@@ -2,6 +2,8 @@
 
 This project showcases a Dungeons & Dragons inventory application built with Node.js & MongoDB as part of the [Odin Project](https://www.theodinproject.com/lessons/nodejs-inventory-application) curriculum.
 
+## [Live View](https://wandering-brook-1752.fly.dev/catalog)
+
 # Features
 
 - Manage your inventory by adding, removing, and updating your items
