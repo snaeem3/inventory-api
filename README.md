@@ -3,13 +3,17 @@
 This project showcases a Dungeons & Dragons inventory application built with Node.js & MongoDB as part of the [Odin Project](https://www.theodinproject.com/lessons/nodejs-inventory-application) curriculum.
 
 ## [Live View](https://wandering-brook-1752.fly.dev/catalog)
+![inventory-app](https://github.com/snaeem3/inventory-application/assets/11710951/13af451b-f08c-42ff-9aa7-796fe5d1d87e)
 
 # Features
 
-- Manage your inventory by adding, removing, and updating your items
-- Organize your items by creating different categories
-- Track your available gold and previous transactions
-- Use the _Equippable Items_ page to quickly equip/unequip items
+🎒 Manage your inventory by adding, removing, and updating your items
+
+📂 Organize your items by creating different categories
+
+💰 Track your available gold and previous transactions
+
+⚔ Use the _Equippable Items_ page to quickly equip/unequip items
 
 # Skills Involved in this project
 
@@ -25,6 +29,7 @@ This project showcases a Dungeons & Dragons inventory application built with Nod
 - Dynamic form handling
 - Express validator to validate and sanitize form data from the backend
 - Asynchronous Error Handling
+- App deployment with [Fly.io](https://fly.io/)
 
 # Prerequisites
 
