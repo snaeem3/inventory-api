@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const compression = require('compression');
 const helmet = require('helmet');
 const RateLimit = require('express-rate-limit');
+const dotenv = require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -26,10 +27,7 @@ const limiter = RateLimit({
 
 mongoose.set('strictQuery', false);
 
-const dev_db_url =
-  'mongodb+srv://sameer4363:eCsq0WiLndXylqWb@cluster0.enn7wej.mongodb.net/inventory?retryWrites=true&w=majority';
-
-const mongoDB = process.env.MONGODB_URI || dev_db_url;
+const mongoDB = process.env.MONGODB_URI;
 
 main().catch((err) => console.log(err));
 async function main() {
