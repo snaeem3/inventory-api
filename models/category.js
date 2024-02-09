@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 
 const CategorySchema = new Schema({
   name: { type: String, required: true, maxLength: 100 },
-  //   category: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+  user: { type: Schema.Types.ObjectId, ref: 'user' }, // user that created this category
+  default: { type: Boolean, default: false },
 });
 
 // Virtual for genre's URL

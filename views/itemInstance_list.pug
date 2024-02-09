@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    h1=title 
+
+    table
+      tr
+        th Name
+        th Equipped?
+      each itemInstance in itemInstances
+        tr
+          td
+            a(href=itemInstance.item.url) #{itemInstance.item.name}
+          td #{itemInstance.equipped}
+
+      else
+        tr There are no item instances.

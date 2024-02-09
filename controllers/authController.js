@@ -1,0 +1,145 @@
+const dotenv = require('dotenv').config();
+const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+// const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+
+// Returns true if the username is unique, false otherwise
+const isUserNameUnique = async (username) => {
+  const user = await User.findOne({ username });
+  return !user;
+};
+
+exports.signUpGET = asyncHandler(async (req, res, next) => {
+  res.render('sign-up', { title: 'Sign-Up', user: req.user, errors: [] });
+});
+
+exports.signUpPOST = [
+  // Validate and sanitize fields
+  body('username', 'User Name must not be empty').trim().notEmpty().escape(),
+  body('username')
+    .trim()
+    .custom(async (value, { req }) => {
+      if (!(await isUserNameUnique(value))) {
+        throw new Error('Username is already taken');
+      }
+      return true;
+    }),
+  body('password', 'Password must be at least 6 characters')
+    .isLength({ min: 6 })
+    .escape(),
+  body('confirmPassword').custom((value, { req }) => {
+    if (value !== req.body.password) {
+      throw new Error('Passwords do not match');
+    }
+    return true;
+  }),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    bcrypt.genSalt(10, async (err, salt) => {
+      bcrypt.hash(req.body.password, salt, async (err, hash) => {
+        if (err) {
+          return next(err); // Handle hashing error
+        }
+
+        const user = new User({
+          username: req.body.username,
+          password: hash,
+          items: [],
+          customCategories: [],
+        });
+
+        if (!errors.isEmpty()) {
+          res.status(403).render('sign-up', {
+            title: 'Sign-Up',
+            username: req.body.username,
+            password: req.body.password,
+            confirmPassword: req.body.confirmPassword,
+            user: req.user,
+            errors: errors.array(),
+          });
+        } else {
+          await user.save();
+          res.status(201).redirect('/');
+        }
+      });
+    });
+  }),
+];
+
+exports.loginGET = asyncHandler(async (req, res, next) => {
+  res.render('log-in', {
+    title: 'Log In',
+    user: req.user,
+    errorMessage: res.locals.errorMessage,
+    // error: req.flash('error'),
+  });
+});
+
+exports.loginPOST = [
+  //   (req, res, next) => {
+  //     passport.authenticate('local', (err, user, info) => {
+  //       if (err) {
+  //         return res.status(500).json({ error: 'Internal Server Error' });
+  //       }
+
+  //       if (!user) {
+  //         return res.status(401).json({ error: info.message });
+  //       }
+
+  //       req.logIn(user, (loginErr) => {
+  //         if (loginErr) {
+  //           return res.status(500).json({ error: 'Internal Server Error' });
+  //         }
+  //         const accessToken = jwt.sign(
+  //           {
+  //             name: user.username,
+  //             isAdmin: user.admin,
+  //             userId: user._id,
+  //           }, // payload needs to be a plain object
+  //           process.env.ACCESS_TOKEN_SECRET
+  //         );
+  //         return res.json({ message: 'Login successful', user, accessToken });
+  //       });
+  //     })(req, res, next);
+  //   },
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/auth/log-in',
+    // failureFlash: true,
+  }),
+];
+
+exports.logout = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      next(err);
+    } else res.redirect('/');
+  });
+};
+
+exports.verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  console.log(authHeader);
+
+  const token = authHeader && authHeader.split(' ')[1];
+  console.log(token);
+
+  if (token === null || token === 'null') {
+    return res.status(401).json({ error: 'Token not provided' });
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+
+    req.user = user;
+    next();
+  });
+};

@@ -6,6 +6,7 @@ const router = express.Router();
 const item_controller = require('../controllers/itemController');
 const category_controller = require('../controllers/categoryController');
 const gold_controller = require('../controllers/goldController');
+const itemInstance_controller = require('../controllers/itemInstanceController');
 
 /// Item ROUTES ///
 
@@ -44,6 +45,19 @@ router.post('/item/:id/unequip', item_controller.equipment_unequip_post);
 
 // POST request to equip item
 router.post('/item/:id/equip', item_controller.equipment_equip_post);
+
+/// ItemInstance ///
+router.get('/itemInstances', itemInstance_controller.user_items);
+
+router.get(
+  '/itemInstances/create',
+  itemInstance_controller.itemInstance_create_get
+);
+
+router.post(
+  '/itemInstances/create',
+  itemInstance_controller.itemInstance_create_post
+);
 
 /// Category ROUTES ///
 

@@ -5,6 +5,9 @@ const Category = require('../models/category');
 const Gold = require('../models/gold');
 
 exports.index = asyncHandler(async (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    res.redirect('/auth/sign-up');
+  }
   // Get details of items, category counts, and gold (in parallel)
   const [
     numItems,

@@ -7,13 +7,13 @@ block content
     tr
       th Name
       th Description
-      th Quantity
+      //- th Quantity
     each item in item_list
       tr
         td
           a(href=item.url) #{item.name}
         td #{item.description}
-        td #{item.quantity}
+        //- td #{item.quantity}
 
     else
       tr There are no items.

@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  main
+    h1 Sign Up
+    form(action="", method="POST")
+      label(for="username") Username
+      input(name="username", placeholder="username@email.com", type="text", value=typeof username !== 'undefined' ? username : '')
+      label(for="password") Password
+      input(name="password", type="password", value=typeof password !== 'undefined' ? password : '')
+      label(for="confirmPassword") Confirm Password
+      input(name="confirmPassword", type="password", value=typeof confirmPassword !== 'undefined' ? confirmPassword : '')
+      button Sign Up
+
+    if errors
+      ul
+        each error in errors
+          li.error= error.msg
+    
+    p Already have an account? 
+    a(href="/auth/log-in") Log In
