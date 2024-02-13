@@ -10,7 +10,6 @@ const userArgs = process.argv.slice(2);
 const mongoose = require('mongoose');
 const Item = require('./models/item');
 const Category = require('./models/category');
-const Gold = require('./models/gold');
 
 const categories = [];
 const items = [];
@@ -27,7 +26,6 @@ async function main() {
   console.log('Debug: Should be connected?');
   await createCategories();
   await createItems();
-  await createGold();
   console.log('Debug: Closing mongoose');
   mongoose.connection.close();
   console.log('Debug: Connection closed');
@@ -38,7 +36,7 @@ async function main() {
 // category[0] will always be the Weapon Category, regardless of the order
 // in which the elements of promise.all's argument complete.
 async function categoryCreate(index, name) {
-  const category = new Category({ name });
+  const category = new Category({ name, default: true });
   await category.save();
   categories[index] = category;
   console.log(`Added category: ${name}`);
@@ -49,20 +47,16 @@ async function itemCreate(
   name,
   description,
   category,
-  quantity,
   value,
   rarity,
-  equippable,
-  equipped
+  equippable
 ) {
   const itemdetail = {
     name,
     description,
-    quantity,
     value,
     rarity,
     equippable,
-    equipped,
   };
   if (category !== false) itemdetail.category = category;
 
@@ -70,17 +64,6 @@ async function itemCreate(
   await item.save();
   items[index] = item;
   console.log(`Added item: ${name}`);
-}
-
-async function goldCreate(quantity, transactions) {
-  const goldDetail = {
-    quantity,
-    transactions,
-  };
-
-  const gold = new Gold(goldDetail);
-  await gold.save();
-  console.log(`Added ${quantity} gold`);
 }
 
 async function createCategories() {
@@ -101,10 +84,8 @@ async function createItems() {
       'Adamantine Armor',
       "This suit of armor is reinforced with adamantine, one of the hardest substances in existence. While you're wearing it, any critical hit against you becomes a normal hit.",
       [categories[2], categories[3]],
-      1,
       500,
       'Uncommon',
-      true,
       true
     ),
     itemCreate(
@@ -112,7 +93,6 @@ async function createItems() {
       'Potion of Healing (Greater)',
       "You regain 4d4 + 4 hit points when you drink this potion. The potion's red liquid glimmers when agitated.",
       [categories[1]],
-      3,
       100,
       'Uncommon',
       false
@@ -122,7 +102,6 @@ async function createItems() {
       'Potion of Water Breathing',
       'You can breathe underwater for 1 hour after drinking this potion. Its cloudy green fluid smells of the sea and has a jellyfish-like bubble floating in it.',
       [categories[1]],
-      1,
       200,
       'Uncommon',
       false
@@ -132,10 +111,8 @@ async function createItems() {
       'Battleaxe',
       '1d8 slashing. Proficiency with a battleaxe allows you to add your proficiency bonus to the attack roll for any attack you make with it.',
       [categories[0]],
-      1,
       10,
       'Common',
-      true,
       true
     ),
     itemCreate(
@@ -143,50 +120,36 @@ async function createItems() {
       'Dagger',
       '1d4 piercing. Proficiency with a dagger allows you to add your proficiency bonus to the attack roll for any attack you make with it.',
       [categories[0]],
-      1,
       2,
       'Common',
-      true,
-      false
+      true
     ),
     itemCreate(
       5,
       'Spiked Armor',
       '14 + Dex modifier (max 2) AC. Stealth: Disadvantage. Spiked armor is a rare type of medium armor made by dwarves. It consists of a leather coat and leggings covered with spikes that are usually made of metal.',
       [categories[2]],
-      1,
       75,
       'Rare',
-      true,
-      false
+      true
     ),
     itemCreate(
       6,
       'Ring of Invisibility',
       'While wearing this ring, you can turn invisible as an action. Anything you are wearing or carrying is invisible with you. You remain invisible until the ring is removed, until you attack or cast a spell, or until you use a bonus action to become visible again.',
       [categories[3]],
-      1,
       1000,
       'Legendary',
-      true,
-      false
+      true
     ),
     itemCreate(
       7,
       'Arrows',
       'Arrows are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.',
       [categories[0]],
-      50,
       1,
       'Common',
       false
     ),
-  ]);
-}
-
-async function createGold() {
-  console.log('Adding Gold');
-  await goldCreate(200, [
-    { prevQuantity: 0, date: Date(), note: 'Initial quantity' },
   ]);
 }
