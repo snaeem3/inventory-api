@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const CategorySchema = new Schema({
-  name: { type: String, required: true, maxLength: 100 },
+  name: { type: String, required: true, maxLength: 100, unique: true }, // lowercase: true
   user: { type: Schema.Types.ObjectId, ref: 'user' }, // user that created this category
   default: { type: Boolean, default: false },
 });

@@ -1,94 +1,38 @@
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
 const Item = require('../models/item');
-const Category = require('../models/category');
-const Gold = require('../models/gold');
-
-exports.index = asyncHandler(async (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    res.redirect('/auth/sign-up');
-  }
-  // Get details of items, category counts, and gold (in parallel)
-  const [
-    numItems,
-    numCategories,
-    numEquipped,
-    numEquippable,
-    top3ValuableItems,
-    gold,
-  ] = await Promise.all([
-    Item.countDocuments({}).exec(),
-    Category.countDocuments({}).exec(),
-    Item.countDocuments({ equipped: true }).exec(),
-    Item.countDocuments({ equippable: true }).exec(),
-    Item.find({}).sort({ value: -1 }).limit(3).exec(),
-    Gold.findOne({}).exec(),
-  ]);
-
-  // Calculate total item value
-  let totalValue = 0;
-  try {
-    const items = await Item.find().exec();
-
-    items.forEach((item) => {
-      totalValue += item.totalValue; // totalValue is a virtual property
-    });
-  } catch (error) {
-    console.error('Error calculating total value:', error);
-    throw error;
-  }
-
-  res.render('index', {
-    title: 'Inventory Home',
-    item_count: numItems,
-    category_count: numCategories,
-    equipped_items: numEquipped,
-    equippable_items: numEquippable,
-    valuableItemList: top3ValuableItems,
-    gold,
-    netWorth: totalValue + gold.quantity,
-  });
-});
+const User = require('../models/user');
 
 // Display list of all items.
 exports.item_list = asyncHandler(async (req, res, next) => {
-  const allItems = await Item.find({})
-    .sort({ name: 1 })
-    // .populate("author")
-    .exec();
-
-  res.render('item_list', { title: 'Item List', item_list: allItems });
-});
-
-// Display detail page for a specific item.
-exports.item_detail = asyncHandler(async (req, res, next) => {
-  // Get details of items
-  const [item] = await Promise.all([
-    Item.findById(req.params.id).populate('category').exec(),
-  ]);
-
-  if (item === null) {
-    // No results.
-    const err = new Error('Item not found');
-    err.status = 404;
-    return next(err);
+  try {
+    const allItems = await Item.find({}).sort({ name: 1 }).exec();
+    res.status(200).json(allItems);
+  } catch (error) {
+    console.error('Error fetching items: ', error);
   }
-
-  res.render('item_detail', {
-    name: item.name,
-    item,
-  });
 });
 
-// Display item create form on GET.
-exports.item_create_get = asyncHandler(async (req, res, next) => {
-  // Get categories, which we can use for adding to our item.
-  const [allCategories] = await Promise.all([Category.find().exec()]);
+// Return detail for a specific item.
+exports.item_detail = asyncHandler(async (req, res, next) => {
+  try {
+    // Get detail of item
+    const item = await Item.findById(req.params.id)
+      .populate('category')
+      .populate({ path: 'creator', select: 'username' })
+      .exec();
+    if (item === null) {
+      // No results.
+      const err = new Error('Item not found');
+      err.status = 404;
+      return next(err);
+    }
 
-  res.render('item_form', {
-    title: 'Create Item',
-    categories: allCategories,
-  });
+    res.status(200).json(item);
+  } catch (error) {
+    console.error('Error ', error);
+    res.status(500);
+  }
 });
 
 // Handle item create on POST.
@@ -108,112 +52,94 @@ exports.item_create_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body('quantity', 'Quantity must be whole and non-negative.')
-    .isInt({ min: 0 })
-    .escape(),
   body('value', 'Value must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
-  body('category.*').escape(),
   // Process request after validation and sanitization.
 
   asyncHandler(async (req, res, next) => {
     // Extract the validation errors from a request.
     const errors = validationResult(req);
 
+    const user = await User.findById(req.user.userId);
     // Create a Item object with escaped and trimmed data.
     const item = new Item({
       name: req.body.name,
       description: req.body.description,
-      category: req.body.category,
-      quantity: req.body.quantity,
+      category:
+        typeof req.body.category === 'undefined' ? [] : req.body.category,
       value: req.body.value,
       rarity: req.body.rarity,
-      equippable: req.body.equippable === 'on',
-      equipped: req.body.equipped === 'on',
+      equippable:
+        req.body.equippable === 'on' ||
+        req.body.equippable === true ||
+        req.body.equippable === 'true',
+      private: req.body.private,
+      creator: user,
     });
 
-    if (!errors.isEmpty()) {
-      // There are errors. Render form again with sanitized values/error messages.
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-      // Get all categories for form.
-      const [allCategories] = await Promise.all([Category.find().exec()]);
-
-      // Mark our selected categories as checked.
-      for (const category of allCategories) {
-        if (item.category.includes(category._id)) {
-          category.checked = 'true';
-        }
-      }
-      res.render('item_form', {
-        title: 'Create Item',
-        categories: allCategories,
-        item,
-        errors: errors.array(),
-      });
-    } else {
-      // Data from form is valid. Save item.
-      await item.save();
-      res.redirect(item.url);
-    }
+    // Data from form is valid. Save item.
+    await item.save();
+    res.status(200).json({ item, url: item.url });
   }),
 ];
 
-// Display item delete form on GET.
-exports.item_delete_get = asyncHandler(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).exec();
-
-  if (item === null) {
-    // No results
-    res.redirect('/catalog/items');
-  }
-  res.render('item_delete', {
-    title: 'Delete Item',
-    item,
-  });
-});
-
-// Handle item delete on POST.
-exports.item_delete_post = asyncHandler(async (req, res, next) => {
-  // Assume valid item id in field
-  await Item.findByIdAndDelete(req.params.id);
-  res.redirect('/catalog/items');
-});
-
-// Display item update form on GET.
-exports.item_update_get = asyncHandler(async (req, res, next) => {
-  // Get item and categories for form.
-  const [item, allCategories] = await Promise.all([
-    Item.findById(req.params.id).populate('category').exec(),
-    Category.find().exec(),
-  ]);
-
-  if (item === null) {
-    // No results.
-    const err = new Error('Item not found');
-    err.status = 404;
-    return next(err);
-  }
-
-  // Mark our selected categories as checked.
-  for (const category of allCategories) {
-    for (const item_c of item.category) {
-      if (category._id.toString() === item_c._id.toString()) {
-        category.checked = 'true';
-      }
+// Handle item delete
+exports.deleteItem = asyncHandler(async (req, res, next) => {
+  try {
+    // Get detail of item
+    const item = await Item.findById(req.params.id)
+      .populate({ path: 'creator', select: 'id' })
+      .exec();
+    if (item === null) {
+      // No results.
+      const err = new Error('Item not found');
+      err.status = 404;
+      return next(err);
     }
-  }
 
-  res.render('item_form', {
-    title: 'Update Item',
-    categories: allCategories,
-    item,
-  });
+    // Verify that user is the creator or an admin
+    console.log('item.creator.id: ', item.creator._id);
+    console.log('req: ', req.user.userId);
+    if (
+      !(
+        (item.creator && item.creator.id === req.user.userId) ||
+        req.user.isAdmin
+      )
+    ) {
+      const err = new Error('You must be the item creator or an admin');
+      err.status = 403;
+      return next(err);
+    }
+
+    // Check if this item is currently in anyone's inventory
+    const usersWithItem = await User.find({
+      'itemInventory.item': req.params.id,
+    });
+    console.log(usersWithItem);
+    if (usersWithItem.length > 0) {
+      const err = new Error(
+        `Item cannot be deleted: ${usersWithItem.length} user(s) currently possess this item in their inventory`
+      );
+      err.status = 403;
+      return next(err);
+    }
+
+    await Item.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ message: `Item ${req.params.id} successfully deleted` });
+  } catch (error) {
+    console.error('Error: ', error);
+    res.status(500);
+  }
 });
 
-// Handle item update on POST.
-exports.item_update_post = [
-  // Convert the category to an array.
+// Handle item update
+exports.updateItem = [
   (req, res, next) => {
     if (!(req.body.category instanceof Array)) {
       if (typeof req.body.category === 'undefined') {
@@ -231,13 +157,9 @@ exports.item_update_post = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body('quantity', 'Quantity must be whole and non-negative.')
-    .isInt({ min: 0 })
-    .escape(),
   body('value', 'Value must be whole and non-negative.')
     .isInt({ min: 0 })
     .escape(),
-  body('category.*').escape(),
 
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
@@ -250,38 +172,24 @@ exports.item_update_post = [
       description: req.body.description,
       category:
         typeof req.body.category === 'undefined' ? [] : req.body.category,
-      quantity: req.body.quantity,
       value: req.body.value,
       rarity: req.body.rarity,
-      equippable: req.body.equippable === 'on',
-      equipped: req.body.equipped === 'on',
+      equippable:
+        req.body.equippable === 'on' ||
+        req.body.equippable === true ||
+        req.body.equippable === 'true',
+      private: req.body.private,
+      // creator?
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
-    if (!errors.isEmpty()) {
-      // There are errors. Render form again with sanitized values/error messages.
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-      // Get all categories for form
-      const [allCategories] = await Promise.all([Category.find().exec()]);
+    // Data from form is valid. Update the record.
+    const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
 
-      // Mark our selected categories as checked.
-      for (const category of allCategories) {
-        if (item.category.indexOf(item._id) > -1) {
-          item.checked = 'true';
-        }
-      }
-      res.render('item_form', {
-        title: 'Update Item',
-        categories: allCategories,
-        item,
-        errors: errors.array(),
-      });
-    } else {
-      // Data from form is valid. Update the record.
-      const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
-      // Redirect to item detail page.
-      res.redirect(updatedItem.url);
-    }
+    res.status(200).json(updatedItem);
   }),
 ];
 
@@ -298,51 +206,9 @@ exports.equippable_list = asyncHandler(async (req, res, next) => {
     .sort({ name: 1 })
     .exec();
 
-  res.render('equipment_list', {
-    title: 'Equippable Items',
-    equippedItems: allEquippedItems,
-    unEquippedItems: allUnequippedItems,
-  });
-});
-
-// Unequip item POST
-exports.equipment_unequip_post = asyncHandler(async (req, res, next) => {
-  // Get details of item
-  const [item] = await Promise.all([
-    Item.findById(req.params.id).populate('category').exec(),
-  ]);
-
-  if (item === null) {
-    // No results.
-    const err = new Error('Item not found');
-    err.status = 404;
-    return next(err);
-  }
-
-  // Unequip item and update in database
-  item.equipped = false;
-  const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
-
-  res.redirect('/catalog/items/equippable');
-});
-
-// Equip item POST
-exports.equipment_equip_post = asyncHandler(async (req, res, next) => {
-  // Get details of item
-  const [item] = await Promise.all([
-    Item.findById(req.params.id).populate('category').exec(),
-  ]);
-
-  if (item === null) {
-    // No results.
-    const err = new Error('Item not found');
-    err.status = 404;
-    return next(err);
-  }
-
-  // Equip item and update in database
-  item.equipped = true;
-  const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
-
-  res.redirect('/catalog/items/equippable');
+  // res.render('equipment_list', {
+  //   title: 'Equippable Items',
+  //   equippedItems: allEquippedItems,
+  //   unEquippedItems: allUnequippedItems,
+  // });
 });

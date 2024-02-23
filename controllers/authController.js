@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 // Returns true if the username is unique, false otherwise
@@ -13,7 +13,8 @@ const isUserNameUnique = async (username) => {
 };
 
 exports.signUpGET = asyncHandler(async (req, res, next) => {
-  res.render('sign-up', { title: 'Sign-Up', user: req.user, errors: [] });
+  // res.render('sign-up', { title: 'Sign-Up', user: req.user, errors: [] });
+  res.json({ title: 'Sign-Up', user: req.user });
 });
 
 exports.signUpPOST = [
@@ -65,61 +66,47 @@ exports.signUpPOST = [
           });
         } else {
           await user.save();
-          res.status(201).redirect('/');
+          res.status(201).json({ message: 'User successfully created' });
         }
       });
     });
   }),
 ];
 
-exports.loginGET = asyncHandler(async (req, res, next) => {
-  res.render('log-in', {
-    title: 'Log In',
-    user: req.user,
-    errorMessage: res.locals.errorMessage,
-    // error: req.flash('error'),
-  });
-});
-
 exports.loginPOST = [
-  //   (req, res, next) => {
-  //     passport.authenticate('local', (err, user, info) => {
-  //       if (err) {
-  //         return res.status(500).json({ error: 'Internal Server Error' });
-  //       }
+  (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) {
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 
-  //       if (!user) {
-  //         return res.status(401).json({ error: info.message });
-  //       }
+      if (!user) {
+        return res.status(401).json({ error: info.message });
+      }
 
-  //       req.logIn(user, (loginErr) => {
-  //         if (loginErr) {
-  //           return res.status(500).json({ error: 'Internal Server Error' });
-  //         }
-  //         const accessToken = jwt.sign(
-  //           {
-  //             name: user.username,
-  //             isAdmin: user.admin,
-  //             userId: user._id,
-  //           }, // payload needs to be a plain object
-  //           process.env.ACCESS_TOKEN_SECRET
-  //         );
-  //         return res.json({ message: 'Login successful', user, accessToken });
-  //       });
-  //     })(req, res, next);
-  //   },
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/auth/log-in',
-    // failureFlash: true,
-  }),
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        const accessToken = jwt.sign(
+          {
+            name: user.username,
+            isAdmin: user.admin,
+            userId: user._id,
+          }, // payload needs to be a plain object
+          process.env.ACCESS_TOKEN_SECRET
+        );
+        return res.json({ message: 'Login successful', user, accessToken });
+      });
+    })(req, res, next);
+  },
 ];
 
 exports.logout = (req, res, next) => {
   req.logout((err) => {
     if (err) {
       next(err);
-    } else res.redirect('/');
+    } else res.json({ message: 'Logout successful' });
   });
 };
 

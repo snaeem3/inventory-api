@@ -49,7 +49,8 @@ async function itemCreate(
   category,
   value,
   rarity,
-  equippable
+  equippable,
+  privateItem
 ) {
   const itemdetail = {
     name,
@@ -57,6 +58,7 @@ async function itemCreate(
     value,
     rarity,
     equippable,
+    private: privateItem,
   };
   if (category !== false) itemdetail.category = category;
 
@@ -86,7 +88,8 @@ async function createItems() {
       [categories[2], categories[3]],
       500,
       'Uncommon',
-      true
+      true,
+      false
     ),
     itemCreate(
       1,
@@ -95,6 +98,7 @@ async function createItems() {
       [categories[1]],
       100,
       'Uncommon',
+      false,
       false
     ),
     itemCreate(
@@ -104,6 +108,7 @@ async function createItems() {
       [categories[1]],
       200,
       'Uncommon',
+      false,
       false
     ),
     itemCreate(
@@ -113,7 +118,8 @@ async function createItems() {
       [categories[0]],
       10,
       'Common',
-      true
+      true,
+      false
     ),
     itemCreate(
       4,
@@ -122,7 +128,8 @@ async function createItems() {
       [categories[0]],
       2,
       'Common',
-      true
+      true,
+      false
     ),
     itemCreate(
       5,
@@ -131,7 +138,8 @@ async function createItems() {
       [categories[2]],
       75,
       'Rare',
-      true
+      true,
+      false
     ),
     itemCreate(
       6,
@@ -140,7 +148,8 @@ async function createItems() {
       [categories[3]],
       1000,
       'Legendary',
-      true
+      true,
+      false
     ),
     itemCreate(
       7,
@@ -149,6 +158,7 @@ async function createItems() {
       [categories[0]],
       1,
       'Common',
+      false,
       false
     ),
   ]);

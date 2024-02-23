@@ -13,6 +13,8 @@ const ItemSchema = new Schema({
     default: 'Unknown',
   },
   equippable: { type: Boolean, required: true, default: false },
+  private: { type: Boolean, required: true },
+  creator: { type: Schema.Types.ObjectId, ref: 'User' },
   // weight
 });
 
