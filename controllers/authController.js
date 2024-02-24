@@ -13,7 +13,6 @@ const isUserNameUnique = async (username) => {
 };
 
 exports.signUpGET = asyncHandler(async (req, res, next) => {
-  // res.render('sign-up', { title: 'Sign-Up', user: req.user, errors: [] });
   res.json({ title: 'Sign-Up', user: req.user });
 });
 

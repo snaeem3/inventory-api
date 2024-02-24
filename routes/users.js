@@ -39,4 +39,14 @@ router.delete(
   userController.deleteInventoryItem
 );
 
+// GET request for user's gold
+router.get(`/:userId/gold`, authController.verifyToken, userController.getGold);
+
+// POST request for user's gold to create transaction
+router.post(
+  `/:userId/gold`,
+  authController.verifyToken,
+  userController.addTransaction
+);
+
 module.exports = router;

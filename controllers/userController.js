@@ -191,3 +191,42 @@ exports.deleteInventoryItem = asyncHandler(async (req, res, next) => {
   await user.save();
   res.status(200).json(user.itemInventory);
 });
+
+exports.getGold = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    res.status(200).json(user.gold);
+  } catch (error) {
+    console.error('Error fetching Gold: ', error);
+  }
+});
+
+exports.addTransaction = [
+  body('newQuantity', 'New quantity must be whole and non-negative')
+    .isInt({ min: 0 })
+    .escape(),
+  body('note', 'Transaction note required').trim().isLength({ min: 1 }),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    try {
+      const user = await User.findById(req.params.userId);
+      user.gold.transactions.push({
+        prevQuantity: req.body.newQuantity,
+        date: req.body.date,
+        note: req.body.note,
+      });
+      user.gold.quantity = req.body.newQuantity;
+
+      await user.save();
+      res.status(200).json(user.gold);
+    } catch (error) {
+      console.error('Error adding transaction: ', error);
+    }
+  }),
+];
