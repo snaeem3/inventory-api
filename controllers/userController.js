@@ -230,3 +230,28 @@ exports.addTransaction = [
     }
   }),
 ];
+
+exports.editGold = [
+  body('newQuantity', 'New quantity must be whole and non-negative')
+    .isInt({ min: 0 })
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    try {
+      const user = await User.findById(req.params.userId);
+
+      user.gold.quantity = req.body.newQuantity;
+
+      await user.save();
+      res.status(200).json(user.gold);
+    } catch (error) {
+      console.error('Error editing gold: ', error);
+    }
+  }),
+];

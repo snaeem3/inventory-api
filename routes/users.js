@@ -49,4 +49,11 @@ router.post(
   userController.addTransaction
 );
 
+// PUT request for user's gold to edit quantity
+router.put(
+  `/:userId/gold`,
+  authController.verifyToken,
+  userController.editGold
+);
+
 module.exports = router;
