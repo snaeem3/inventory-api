@@ -42,6 +42,13 @@ router.delete(
 // GET request for user's gold
 router.get(`/:userId/gold`, authController.verifyToken, userController.getGold);
 
+// PUT request for user's gold to edit quantity
+router.put(
+  `/:userId/gold`,
+  authController.verifyToken,
+  userController.editGold
+);
+
 // POST request for user's gold to create transaction
 router.post(
   `/:userId/gold`,
@@ -49,11 +56,11 @@ router.post(
   userController.addTransaction
 );
 
-// PUT request for user's gold to edit quantity
-router.put(
-  `/:userId/gold`,
+// DELETE request for user's transaction
+router.delete(
+  `/:userId/gold/:transactionId`,
   authController.verifyToken,
-  userController.editGold
+  userController.deleteTransaction
 );
 
 module.exports = router;

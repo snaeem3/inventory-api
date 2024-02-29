@@ -201,6 +201,31 @@ exports.getGold = asyncHandler(async (req, res, next) => {
   }
 });
 
+exports.editGold = [
+  body('newQuantity', 'New quantity must be whole and non-negative')
+    .isInt({ min: 0 })
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    try {
+      const user = await User.findById(req.params.userId);
+
+      user.gold.quantity = req.body.newQuantity;
+
+      await user.save();
+      res.status(200).json(user.gold);
+    } catch (error) {
+      console.error('Error editing gold: ', error);
+    }
+  }),
+];
+
 exports.addTransaction = [
   body('newQuantity', 'New quantity must be whole and non-negative')
     .isInt({ min: 0 })
@@ -231,27 +256,24 @@ exports.addTransaction = [
   }),
 ];
 
-exports.editGold = [
-  body('newQuantity', 'New quantity must be whole and non-negative')
-    .isInt({ min: 0 })
-    .escape(),
+exports.deleteTransaction = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    const transactionIndex = user.gold.transactions.findIndex(
+      (transaction) => transaction.id === req.params.transactionId
+    );
 
-  asyncHandler(async (req, res, next) => {
-    // Extract the validation errors from a request
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
-
-    try {
-      const user = await User.findById(req.params.userId);
-
-      user.gold.quantity = req.body.newQuantity;
-
-      await user.save();
-      res.status(200).json(user.gold);
-    } catch (error) {
-      console.error('Error editing gold: ', error);
+    if (transactionIndex === -1) {
+      const err = new Error('Transaction not found');
+      err.status = 400;
+      return next(err);
     }
-  }),
-];
+
+    user.gold.transactions.splice(transactionIndex, 1);
+
+    await user.save();
+    res.status(200).json(user.gold);
+  } catch (error) {
+    console.error('Error deleting transaction: ', error);
+  }
+});
