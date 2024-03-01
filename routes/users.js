@@ -56,6 +56,13 @@ router.post(
   userController.addTransaction
 );
 
+// PUT request for user's transaction
+router.put(
+  `/:userId/gold/:transactionId`,
+  authController.verifyToken,
+  userController.updateTransaction
+);
+
 // DELETE request for user's transaction
 router.delete(
   `/:userId/gold/:transactionId`,
