@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
@@ -41,6 +42,12 @@ main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
 }
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

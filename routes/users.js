@@ -1,8 +1,23 @@
 const express = require('express');
+const multer = require('multer');
 const authController = require('../controllers/authController');
 const userController = require('../controllers/userController');
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// GET request for user data
+router.get('/:userId', authController.verifyToken, userController.getUserData);
+
+// PUT request for updating user profile picture
+router.put(
+  '/:userId/avatar',
+  authController.verifyToken,
+  upload.single('image'),
+  userController.updateProfilePicture
+);
 
 // GET request for user's inventory
 router.get(

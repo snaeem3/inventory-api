@@ -1,7 +1,81 @@
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const cloudinary = require('cloudinary').v2;
+const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user');
 const Item = require('../models/item');
+
+exports.getUserData = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .select('-password')
+      .populate({
+        path: 'itemInventory',
+        populate: { path: 'item', model: 'Item' },
+      });
+
+    if (!user) {
+      const err = new Error(`User ${req.params.userId} not found`);
+      err.status = 404;
+      return next(err);
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error getting user data');
+    return next(error);
+  }
+});
+
+exports.updateProfilePicture = [
+  asyncHandler(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.userId);
+
+      if (user.id !== req.user.userId && !user.admin) {
+        const err = new Error(
+          'You must be this user or an admin to update the profile'
+        );
+        err.status = 403;
+        return next(err);
+      }
+
+      let imageUrl;
+
+      if (req.file) {
+        try {
+          const imageBuffer = req.file.buffer.toString('base64');
+          const uniqueIdentifier = uuidv4();
+
+          const result = await cloudinary.uploader.upload(
+            `data:${req.file.mimetype};base64,${imageBuffer}`,
+            {
+              public_id: uniqueIdentifier,
+              folder: 'inventory-api/profileImages/',
+            }
+          );
+
+          console.log(result);
+          imageUrl = result.secure_url;
+        } catch (error) {
+          console.error('Error uplading image to cloudinary: ', error);
+          res
+            .status(500)
+            .json({ error: 'Error uploading image to cloudinary' });
+        }
+
+        user.profilePicture = imageUrl;
+        await user.save();
+
+        res.status(200).json(user.profilePicture);
+      } else {
+        console.error('Error uploading file');
+      }
+    } catch (error) {
+      console.error('Error updating profile: ', error);
+    }
+  }),
+];
 
 exports.getInventory = asyncHandler(async (req, res, next) => {
   try {

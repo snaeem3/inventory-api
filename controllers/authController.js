@@ -92,6 +92,7 @@ exports.loginPOST = [
             name: user.username,
             isAdmin: user.admin,
             userId: user._id,
+            profilePicture: user.profilePicture,
           }, // payload needs to be a plain object
           process.env.ACCESS_TOKEN_SECRET
         );
