@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const cloudinary = require('cloudinary').v2;
+const { v4: uuidv4 } = require('uuid');
 const Item = require('../models/item');
 const User = require('../models/user');
 
@@ -74,7 +76,10 @@ exports.item_create_post = [
         req.body.equippable === 'on' ||
         req.body.equippable === true ||
         req.body.equippable === 'true',
-      private: req.body.private,
+      private:
+        req.body.private === 'on' ||
+        req.body.private === true ||
+        req.body.private === 'true',
       creator: user,
     });
 
@@ -190,6 +195,55 @@ exports.updateItem = [
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
 
     res.status(200).json(updatedItem);
+  }),
+];
+
+exports.updateItemPicture = [
+  asyncHandler(async (req, res, next) => {
+    try {
+      const item = await Item.findById(req.params.id);
+
+      if (!item) {
+        const err = new Error('Item not found');
+        err.status = 404;
+        return next(err);
+      }
+
+      let imageUrl;
+
+      if (req.file) {
+        try {
+          const imageBuffer = req.file.buffer.toString('base64');
+          const uniqueIdentifier = uuidv4();
+
+          const result = await cloudinary.uploader.upload(
+            `data:${req.file.mimetype};base64,${imageBuffer}`,
+            {
+              public_id: uniqueIdentifier,
+              folder: 'inventory-api/items/',
+            }
+          );
+
+          console.log(result);
+          imageUrl = result.secure_url;
+        } catch (error) {
+          console.error('Error uploading image to cloudinary: ', error);
+          res
+            .status(500)
+            .json({ error: 'Error uploading image to cloudinary' });
+        }
+
+        item.picture = imageUrl;
+        await item.save();
+
+        res.status(200).json(item.picture);
+      } else {
+        console.error('Error uploading file, req.file not found');
+      }
+    } catch (error) {
+      console.error('Error updating item picture: ', error);
+      return next(error);
+    }
   }),
 ];
 

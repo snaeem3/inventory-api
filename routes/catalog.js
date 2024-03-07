@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 
 const router = express.Router();
 
@@ -7,12 +8,16 @@ const item_controller = require('../controllers/itemController');
 const category_controller = require('../controllers/categoryController');
 const authController = require('../controllers/authController');
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 /// Item ROUTES ///
 
 // POST request for creating item.
 router.post(
-  '/item/create',
+  '/item',
   authController.verifyToken,
+  // upload.single('image'),
   item_controller.item_create_post
 );
 
@@ -20,6 +25,13 @@ router.post(
 router.get('/item/:id', item_controller.item_detail);
 
 router.put('/item/:id', authController.verifyToken, item_controller.updateItem);
+
+router.put(
+  '/item/:id/picture',
+  authController.verifyToken,
+  upload.single('image'),
+  item_controller.updateItemPicture
+);
 
 // GET request for list of all item items.
 router.get('/items', item_controller.item_list);
