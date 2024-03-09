@@ -8,6 +8,9 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// GET Request for all users
+router.get('/', userController.getUsers);
+
 // GET request for user data
 router.get('/:userId', authController.verifyToken, userController.getUserData);
 

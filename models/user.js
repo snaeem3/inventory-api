@@ -10,9 +10,8 @@ const UserSchema = new Schema(
     admin: { type: Boolean, required: true, default: false },
     itemInventory: [
       {
-        item: { type: Schema.Types.ObjectId, ref: 'Item', unique: true },
+        item: { type: Schema.Types.ObjectId, ref: 'Item' },
         quantity: { type: Number, default: 1 },
-        // lastModified: { type: Schema.Types.Date, default: Date.now },
         favorite: { type: Boolean, default: false },
       },
     ],

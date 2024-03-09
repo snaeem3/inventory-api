@@ -5,6 +5,16 @@ const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user');
 const Item = require('../models/item');
 
+exports.getUsers = asyncHandler(async (req, res, next) => {
+  try {
+    const users = await User.find().select('-password').exec();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error getting users');
+    return next(error);
+  }
+});
+
 exports.getUserData = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId)
@@ -132,40 +142,55 @@ exports.addItemToInventory = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const user = await User.findById(req.params.userId);
-
-    if (user.id !== req.user.userId && !req.user.admin) {
-      return res.status(403).json({
-        message: 'You must be the owner of this inventory or an admin',
+    try {
+      const user = await User.findById(req.params.userId).populate({
+        path: 'itemInventory',
+        populate: { path: 'item', model: 'Item' },
       });
-    }
 
-    const inventoryIndex = user.itemInventory.findIndex(
-      (inventoryItem) => inventoryItem.item._id === req.body.itemId
-    );
-
-    if (inventoryIndex === -1) {
-      // Item not found in inventory
-      const item = await Item.findById(req.body.itemId);
-
-      // Item doesn't exist
-      if (item === null || item === 'null') {
-        const err = new Error('Item not found');
-        err.status = 404;
+      if (user.id !== req.user.userId && !req.user.admin) {
+        const err = new Error(
+          'You must be the owner of this inventory or an admin'
+        );
+        err.status = 403;
         return next(err);
       }
 
-      // Item exists, but needs to be added for this user
-      const newItem = { item, quantity: req.body.quantity };
+      const inventoryIndex = user.itemInventory.findIndex(
+        (inventoryItem) => inventoryItem.item.id === req.body.itemId
+      );
 
-      user.itemInventory.push(newItem);
-    } else {
-      // Item is in inventory
-      user.itemInventory[inventoryIndex] += req.body.quantity;
+      if (inventoryIndex === -1) {
+        // Item not found in inventory
+        const item = await Item.findById(req.body.itemId);
+
+        // Item doesn't exist
+        if (item === null || item === 'null') {
+          const err = new Error('Item not found');
+          err.status = 404;
+          return next(err);
+        }
+
+        // Item exists, but needs to be added for this user
+        const newInventoryItem = {
+          item,
+          quantity: parseInt(req.body.quantity),
+        };
+
+        user.itemInventory.push(newInventoryItem);
+      } else {
+        // Item is in inventory
+        user.itemInventory[inventoryIndex].quantity += parseInt(
+          req.body.quantity
+        );
+      }
+
+      await user.save();
+      res.status(200).json(user.itemInventory);
+    } catch (error) {
+      console.error('Error adding item to inventory: ', error);
+      return next(error);
     }
-
-    await user.save();
-    res.status(200).json(user.itemInventory);
   }),
 ];
 

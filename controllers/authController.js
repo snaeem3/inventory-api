@@ -19,7 +19,7 @@ exports.signUpGET = asyncHandler(async (req, res, next) => {
 exports.signUpPOST = [
   // Validate and sanitize fields
   body('username', 'User Name must not be empty').trim().notEmpty().escape(),
-  body('username')
+  body('username', 'User Name must be unique')
     .trim()
     .custom(async (value, { req }) => {
       if (!(await isUserNameUnique(value))) {
@@ -30,7 +30,7 @@ exports.signUpPOST = [
   body('password', 'Password must be at least 6 characters')
     .isLength({ min: 6 })
     .escape(),
-  body('confirmPassword').custom((value, { req }) => {
+  body('confirmPassword', 'Passwords must match').custom((value, { req }) => {
     if (value !== req.body.password) {
       throw new Error('Passwords do not match');
     }
@@ -50,20 +50,12 @@ exports.signUpPOST = [
         const user = new User({
           username: req.body.username,
           password: hash,
-          items: [],
+          itemInventory: [],
           customCategories: [],
         });
 
-        if (!errors.isEmpty()) {
-          res.status(403).render('sign-up', {
-            title: 'Sign-Up',
-            username: req.body.username,
-            password: req.body.password,
-            confirmPassword: req.body.confirmPassword,
-            user: req.user,
-            errors: errors.array(),
-          });
-        } else {
+        if (!errors.isEmpty()) res.status(400).json({ errors: errors.array() });
+        else {
           await user.save();
           res.status(201).json({ message: 'User successfully created' });
         }
