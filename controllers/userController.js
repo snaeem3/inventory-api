@@ -30,7 +30,7 @@ exports.getUserData = asyncHandler(async (req, res, next) => {
       return next(err);
     }
 
-    res.status(200).json(user);
+    res.status(200).json(user.toObject({ virtuals: true }));
   } catch (error) {
     console.error('Error getting user data');
     return next(error);

@@ -43,4 +43,16 @@ UserSchema.virtual('url').get(function () {
   return `/users/${this._id}`;
 });
 
+// Define virtual field to calculate net worth
+UserSchema.virtual('netWorth').get(function () {
+  let netWorth = this.gold.quantity;
+
+  // Add value of each item multiplied by its quantity
+  this.itemInventory.forEach((inventoryItem) => {
+    netWorth += inventoryItem.item.value * inventoryItem.quantity || 0; // If value is undefined, consider it as 0
+  });
+
+  return netWorth;
+});
+
 module.exports = mongoose.model('User', UserSchema);
