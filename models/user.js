@@ -13,6 +13,7 @@ const UserSchema = new Schema(
         item: { type: Schema.Types.ObjectId, ref: 'Item' },
         quantity: { type: Number, default: 1 },
         favorite: { type: Boolean, default: false },
+        equipped: { type: Boolean },
       },
     ],
     customCategories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],

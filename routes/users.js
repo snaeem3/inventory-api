@@ -50,6 +50,13 @@ router.put(
   userController.changeInventoryItem
 );
 
+// PUT request to toggle inventory item equipped
+router.put(
+  `/:userId/inventory/:itemId/equip-toggle`,
+  authController.verifyToken,
+  userController.toggleEquipped
+);
+
 // DELETE request to delete specific inventory item
 router.delete(
   `/:userId/inventory/:itemId`,

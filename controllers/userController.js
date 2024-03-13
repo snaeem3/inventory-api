@@ -250,6 +250,69 @@ exports.changeInventoryItem = [
   }),
 ];
 
+exports.toggleEquipped = [
+  asyncHandler(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.userId).populate({
+        path: 'itemInventory',
+        populate: { path: 'item', model: 'Item' },
+      });
+
+      if (!user) {
+        const err = new Error(`User ${req.params.userId} not found`);
+        err.status = 404;
+        return next(err);
+      }
+
+      if (user.id !== req.user.userId && !req.user.admin) {
+        const err = new Error(
+          `You must be the owner of this inventory or an admin`
+        );
+        err.status = 403;
+        return next(err);
+      }
+
+      const inventoryIndex = user.itemInventory.findIndex(
+        (inventoryItem) => inventoryItem.item.id === req.params.itemId
+      );
+
+      if (inventoryIndex === -1) {
+        // Item not found in inventory
+        const item = await Item.findById(req.params.itemId);
+
+        // Item doesn't exist
+        if (item === null || item === 'null') {
+          const err = new Error('Item not found');
+          err.status = 404;
+          return next(err);
+        }
+
+        // Item exists, but not added to inventory
+        const err = new Error('Item not currently in inventory');
+        err.status = 400;
+        return next(err);
+      }
+
+      if (!user.itemInventory[inventoryIndex].item.equippable) {
+        // Item is not equippable
+        const err = new Error('Item is not equippable');
+        err.status = 400;
+        return next(err);
+      }
+
+      // toggle equipped value
+      user.itemInventory[inventoryIndex].equipped =
+        !user.itemInventory[inventoryIndex].equipped;
+
+      await user.save();
+      res.status(200).json(user.itemInventory[inventoryIndex]);
+    } catch (error) {
+      console.error('Error toggling equipped: ', error);
+      return next(error);
+    }
+  }),
+];
+
 exports.deleteInventoryItem = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.userId).populate({
     path: 'itemInventory',
