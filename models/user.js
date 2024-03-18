@@ -2,20 +2,24 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+const InventoryItemSchema = new Schema(
+  {
+    item: { type: Schema.Types.ObjectId, ref: 'Item' },
+    quantity: { type: Number, default: 1 },
+    favorite: { type: Boolean, default: false },
+    equipped: { type: Boolean },
+    // customDescription: { type: String },
+  },
+  { timestamps: true }
+);
+
 const UserSchema = new Schema(
   {
     //   displayName: { type: String, required: true, maxLength: 100 },
     username: { type: String, required: true, unique: true, maxLength: 100 },
     password: { type: String, required: true, minLength: 6 },
     admin: { type: Boolean, required: true, default: false },
-    itemInventory: [
-      {
-        item: { type: Schema.Types.ObjectId, ref: 'Item' },
-        quantity: { type: Number, default: 1 },
-        favorite: { type: Boolean, default: false },
-        equipped: { type: Boolean },
-      },
-    ],
+    itemInventory: [InventoryItemSchema],
     customCategories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
     gold: {
       quantity: { type: Number, required: true, default: 0 },
