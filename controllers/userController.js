@@ -4,6 +4,9 @@ const cloudinary = require('cloudinary').v2;
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user');
 const Item = require('../models/item');
+const {
+  extractCloudinaryPublicId,
+} = require('../utils/extractCloudinaryPublicId');
 
 exports.getUsers = asyncHandler(async (req, res, next) => {
   try {
@@ -74,6 +77,23 @@ exports.updateProfilePicture = [
             .json({ error: 'Error uploading image to cloudinary' });
         }
 
+        // Delete image from cloudinary
+        if (user.profilePicture) {
+          try {
+            // Extract public_id from the image URL
+            const public_id = extractCloudinaryPublicId(user.profilePicture);
+            const result = await cloudinary.uploader.destroy(
+              `inventory-api/profileImages/${public_id}`
+            );
+            console.log(result);
+          } catch (error) {
+            console.error(
+              'Error deleting profilePicture from cloudinary: ',
+              error
+            );
+          }
+        }
+
         user.profilePicture = imageUrl;
         await user.save();
 
@@ -82,7 +102,7 @@ exports.updateProfilePicture = [
         console.error('Error uploading file');
       }
     } catch (error) {
-      console.error('Error updating profile: ', error);
+      console.error('Error updating profile picture: ', error);
     }
   }),
 ];
