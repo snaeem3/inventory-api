@@ -4,6 +4,9 @@ const cloudinary = require('cloudinary').v2;
 const { v4: uuidv4 } = require('uuid');
 const Item = require('../models/item');
 const User = require('../models/user');
+const {
+  extractCloudinaryPublicId,
+} = require('../utils/extractCloudinaryPublicId');
 
 // Display list of all items.
 exports.item_list = asyncHandler(async (req, res, next) => {
@@ -231,6 +234,20 @@ exports.updateItemPicture = [
           res
             .status(500)
             .json({ error: 'Error uploading image to cloudinary' });
+        }
+
+        // Delete image from cloudinary
+        if (item.picture) {
+          try {
+            // Extract public_id from the image URL
+            const public_id = extractCloudinaryPublicId(item.picture);
+            const result = await cloudinary.uploader.destroy(
+              `inventory-api/items/${public_id}`
+            );
+            console.log(result);
+          } catch (error) {
+            console.error('Error deleting image from cloudinary: ', error);
+          }
         }
 
         item.picture = imageUrl;
