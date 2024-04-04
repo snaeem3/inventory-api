@@ -11,7 +11,10 @@ const {
 // Display list of all items.
 exports.item_list = asyncHandler(async (req, res, next) => {
   try {
-    const allItems = await Item.find({}).sort({ name: 1 }).exec();
+    const allItems = await Item.find({})
+      .populate('category')
+      .sort({ name: 1 })
+      .exec();
     res.status(200).json(allItems);
   } catch (error) {
     console.error('Error fetching items: ', error);
