@@ -6,7 +6,7 @@
 
 const debug = require('debug')('inventory-application:server');
 const http = require('http');
-const app = require('../api/index');
+const app = require('../index');
 
 /**
  * Get port from environment and store in Express.
