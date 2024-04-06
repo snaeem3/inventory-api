@@ -59,8 +59,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const corsOptions = {
+  origin: 'http://localhost:5173',
+};
+
 // Enable CORS for all routes
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
 
