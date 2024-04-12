@@ -61,7 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions = {
   origin: [
-    'http://localhost:5173',
+    // 'http://localhost:5173',
     'https://inventory-client-plum.vercel.app/',
   ],
 };
