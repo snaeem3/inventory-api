@@ -60,7 +60,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'https://inventory-client-plum.vercel.app/',
+  ],
 };
 
 // Enable CORS for all routes
