@@ -12,7 +12,7 @@ const upload = multer({ storage });
 router.get('/', userController.getUsers);
 
 // GET request for user data
-router.get('/:userId', authController.verifyToken, userController.getUserData);
+router.get('/:userId', userController.getUserData);
 
 // PUT request for updating user profile picture
 router.put(
