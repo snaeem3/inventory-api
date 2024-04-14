@@ -63,6 +63,7 @@ const corsOptions = {
   origin: [
     // 'http://localhost:5173',
     'https://inventory-client-plum.vercel.app/',
+    'https://inventory-client-plum.vercel.app',
   ],
 };
 
