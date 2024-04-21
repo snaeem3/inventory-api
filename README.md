@@ -76,7 +76,8 @@ See the [client project](https://github.com/snaeem3/inventory-client?tab=readme-
 - [Mongoose](https://mongoosejs.com/) to connect to a MongoDB database
 - Querying data from MongoDB
 - CRUD (Create, Read, Update, and Delete) operations in MongoDB: `findByIdAndDelete()`, `findByIdAndUpdate()`, etc.
-- [Cloudinary]() to manage image storage and retrieval
+- [Cloudinary](https://cloudinary.com/) to manage image storage and retrieval
+- [Multer](https://www.npmjs.com/package/multer) to handle file upload requests from client
 - [JSON Web Token (JWT)](https://jwt.io/) for secure and verifiable user authentication
   - Creation of token when users successfully log-in
   - Token verification when users make certain requests (e.g. Blog post creation, comment deletion, etc.)
