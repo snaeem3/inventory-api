@@ -71,7 +71,7 @@ See the [client project](https://github.com/snaeem3/inventory-client?tab=readme-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Skills Involved in this project
+## Skills Involved with this project
 
 - [Mongoose](https://mongoosejs.com/) to connect to a MongoDB database
 - Querying data from MongoDB

@@ -60,11 +60,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions = {
-  origin: [
-    // 'http://localhost:5173',
-    'https://inventory-client-plum.vercel.app/',
-    'https://inventory-client-plum.vercel.app',
-  ],
+  origin:
+    process.env.NODE_ENV === 'production'
+      ? [
+          'https://inventory-client-plum.vercel.app/',
+          'https://inventory-client-plum.vercel.app',
+        ]
+      : 'http://localhost:5173',
 };
 
 // Enable CORS for all routes
